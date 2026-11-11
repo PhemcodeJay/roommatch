@@ -73,7 +73,17 @@ def close_db(_):
     if d: d.close()
 
 def init_db():
-    c = sqlite3.connect(DB_PATH)
+    # Determine the database path, fallback to local if /data is not writable
+    db_path = DB_PATH
+    # Ensure the directory for the database exists
+    db_dir = os.path.dirname(db_path)
+    if db_dir and not os.path.exists(db_dir):
+        try:
+            os.makedirs(db_dir, exist_ok=True)
+        except PermissionError:
+            # Fall back to local database if /data is not writable (e.g., Render without persistent disk)
+            db_path = os.path.join(BASE, "roommatch.db")
+    c = sqlite3.connect(db_path)
     c.executescript(SCHEMA); c.commit(); c.close()
 init_db()
 
@@ -251,6 +261,9 @@ def listings():
         FROM listings l JOIN users u ON u.id=l.user_id ORDER BY l.id DESC LIMIT 500""", (u, u)).fetchall()
     return jsonify(listings=[dict(r) for r in rows])
 
+LISTING_FEE = 20
+APPLICATION_FEE = 15
+
 @app.post("/api/listings")
 def add_listing():
     u = current_user()
@@ -264,8 +277,8 @@ def add_listing():
     except (TypeError, ValueError): return err("Enter a valid price.")
     if not math.isfinite(price) or price < 0 or t not in ("Room", "Roommate", "Sublet") or not title or not city or not contact:
         return err("Please fill in type, title, city, price and contact.")
-    cur = db().execute("INSERT INTO listings(user_id,type,title,city,price,description,contact,created_at) VALUES(?,?,?,?,?,?,?,?)",
-                       (u["id"], t, title, city, price, desc, contact, int(time.time())))
+    cur = db().execute("INSERT INTO listings(user_id,type,title,city,price,description,contact,created_at,payment_status,payment_method,listing_fee,application_fee) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)",
+                       (u["id"], t, title, city, price, desc, contact, int(time.time()), "paid", "zelle", LISTING_FEE, APPLICATION_FEE))
     db().commit()
     return jsonify(id=cur.lastrowid), 201
 
