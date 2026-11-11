@@ -2,3 +2,6 @@
 _pycache_/
 roommatch.db
 .gitignore
+.env_backup
+roommatch.db
+app_backup.py

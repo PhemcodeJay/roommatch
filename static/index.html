@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>RoomMatch – Rooms, Roommates & Sublets</title>
+<title>RoomMatch â€“ Rooms, Roommates & Sublets</title>
 <style>
 :root{--bg:#f6f7f9;--card:#fff;--text:#1a2233;--muted:#5d6778;--line:#e1e5ec;--accent:#2563eb;--accent-text:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10141c;--card:#1a2030;--text:#e8ecf4;--muted:#9aa5b8;--line:#2b3347;--accent:#5b8cff;--accent-text:#0b1020;color-scheme:dark}}
@@ -39,7 +39,11 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:20px}
 <body>
 <header>
   <div class="logo">Room<span>Match</span></div>
-  <div style="display:flex;gap:12px;align-items:center"><span id="acct"></span><button id="authBtn">Sign in</button><button class="primary" id="postBtn">+ Post a listing</button></div>
+  <div style="display:flex;gap:12px;align-items:center">
+       <span id="acct"></span>
+       <button id="authBtn">Sign in</button>
+       <span id="registerPrompt" style="font-size:12px;color:var(--muted);cursor:pointer;text-decoration:underline;">Register</span>
+     </div>
 </header>
 
 <section class="hero">
@@ -52,7 +56,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:20px}
   <button data-t="Room">Rooms</button>
   <button data-t="Roommate">Roommates</button>
   <button data-t="Sublet">Sublets</button>
-  <button data-t="saved">♥ Saved</button>
+  <button data-t="saved">â™¥ Saved</button>
   <button data-t="mine">My listings</button>
 </div>
 
@@ -72,7 +76,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:20px}
   <label>Title</label><input id="fTitle" placeholder="Sunny room near campus">
   <label>City / area</label><input id="fCity" placeholder="Austin, TX">
   <label>Monthly price</label><input id="fPrice" type="number" min="0">
-  <label>Details</label><textarea id="fDesc" rows="3" placeholder="Move-in date, amenities, house rules…"></textarea>
+  <label>Details</label><textarea id="fDesc" rows="3" placeholder="Move-in date, amenities, house rulesâ€¦"></textarea>
   <label>Contact (email or phone)</label><input id="fContact">
   <div class="row"><button id="cancel">Cancel</button><button class="primary" id="save">Publish</button></div>
 </dialog>
@@ -118,11 +122,11 @@ function render(){
   $("grid").innerHTML=r.length?r.map(l=>`<article class="card">
     <span class="tag">${esc(l.type)}</span><h3>${esc(l.title)}</h3>
     <div class="price">$${Number(l.price).toLocaleString()} <small>/ month</small></div>
-    <div class="meta">${esc(l.city)} · by ${esc(l.owner_name)}</div>
+    <div class="meta">${esc(l.city)} Â· by ${esc(l.owner_name)}</div>
     <p style="margin:0">${esc(l.desc)}</p>
     <div class="row2"><button class="primary" data-c="${l.id}">Contact</button>
-<button class="wa-btn" data-id="${l.id}" title="WhatsApp">💬</button>
-    ${me?`<button class="fav ${l.saved?"on":""}" data-f="${l.id}" title="Save">♥</button>`:""}
+<button class="wa-btn" data-id="${l.id}" title="WhatsApp">ðŸ’¬</button>
+    ${me?`<button class="fav ${l.saved?"on":""}" data-f="${l.id}" title="Save">â™¥</button>`:""}
     ${l.mine?`<button data-d="${l.id}">Delete</button>`:""}</div></article>`).join(""):'<div class="empty">No listings here yet.</div>';
 }
 async function load(){try{L=(await api("/api/listings")).listings}catch(e){L=[]}render()}
@@ -130,7 +134,7 @@ function needAuth(){openAuth(false)}
 function openAuth(r){reg=r;$("aTitle").textContent=r?"Create account":"Sign in";$("aGo").textContent=r?"Sign up":"Sign in";
   $("aSwitch").textContent=r?"I have an account":"Create an account";$("nameWrap").hidden=!r;$("aErr").textContent="";
   $("aPw").autocomplete=r?"new-password":"current-password";$("authDlg").showModal()}
-$("authBtn").onclick=async()=>{if(me){await api("/api/logout","POST",{});me=null;if(tab==="saved"||tab==="mine")tab="all";await load()}else openAuth(false)};
+$("authBtn").onclick=async()=>{if(me){await api("/api/logout","POST",{});me=null;if(tab==="saved"||tab==="mine")tab="all";await load()}else openAuth(false)}; $("registerPrompt").onclick=()=>openAuth(true);
 $("aSwitch").onclick=()=>openAuth(!reg);$("aCancel").onclick=()=>$("authDlg").close();
 $("aGo").onclick=async()=>{
   try{const d=await api(reg?"/api/register":"/api/login","POST",{name:$("aName").value,email:$("aEmail").value,password:$("aPw").value});
@@ -161,5 +165,5 @@ $("save").onclick=async()=>{
 };
 (async()=>{try{me=(await api("/api/me")).user}catch(e){}await load()})();
 </script>
-</body>
+<a href="https://wa.me/" class="wa-float" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000; border-radius: 50%; background: #25d366; color: white; width: 60px; height: 60px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3);" title="WhatsApp us">💬</a></body>
 </html>
