@@ -45,7 +45,11 @@ CREATE TABLE IF NOT EXISTS listings(
   type TEXT NOT NULL CHECK(type IN ('Room','Roommate','Sublet')),
   title TEXT NOT NULL, city TEXT NOT NULL, price REAL NOT NULL,
   description TEXT NOT NULL DEFAULT '', contact TEXT NOT NULL,
-  created_at INTEGER NOT NULL);
+  created_at INTEGER NOT NULL,
+  payment_status TEXT NOT NULL DEFAULT 'pending',
+  payment_method TEXT NOT NULL DEFAULT 'zelle',
+  listing_fee REAL NOT NULL DEFAULT 20,
+  application_fee REAL NOT NULL DEFAULT 15);
 CREATE TABLE IF NOT EXISTS favorites(
   user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   listing_id INTEGER NOT NULL REFERENCES listings(id) ON DELETE CASCADE,
