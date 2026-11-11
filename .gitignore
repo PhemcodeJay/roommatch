@@ -5,3 +5,4 @@ roommatch.db
 .env_backup
 roommatch.db
 app_backup.py
+__pycache__/app.cpython-313.pyc
